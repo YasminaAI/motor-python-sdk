@@ -29,12 +29,12 @@ class BaseClientWrapper:
         import platform
 
         headers: typing.Dict[str, str] = {
-            "User-Agent": "yasmina-motor-python/0.0.1",
+            "User-Agent": "motor-python-sdk/0.0.2",
             "X-Fern-Language": "Python",
             "X-Fern-Runtime": f"python/{platform.python_version()}",
             "X-Fern-Platform": f"{platform.system().lower()}/{platform.release()}",
-            "X-Fern-SDK-Name": "yasmina-motor-python",
-            "X-Fern-SDK-Version": "0.0.1",
+            "X-Fern-SDK-Name": "motor-python-sdk",
+            "X-Fern-SDK-Version": "0.0.2",
             **(self.get_custom_headers() or {}),
         }
         headers["Authorization"] = f"Bearer {self._get_token()}"
