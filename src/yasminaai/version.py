@@ -1,3 +1,3 @@
 from importlib import metadata
 
-__version__ = metadata.version("yasminaai")
+__version__ = metadata.version("yasmina-motor-python")
