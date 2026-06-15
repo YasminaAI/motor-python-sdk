@@ -1,7 +1,7 @@
 # Yasminaai Python Library
 
 [![fern shield](https://img.shields.io/badge/%F0%9F%8C%BF-Built%20with%20Fern-brightgreen)](https://buildwithfern.com?utm_source=github&utm_medium=github&utm_campaign=readme&utm_source=https%3A%2F%2Fgithub.com%2FYasminaAI%2Fmotor-python-sdk)
-[![pypi](https://img.shields.io/pypi/v/yasminaai)](https://pypi.python.org/pypi/yasminaai)
+[![pypi](https://img.shields.io/pypi/v/yasmina-motor-python)](https://pypi.python.org/pypi/yasmina-motor-python)
 
 The Yasminaai Python library provides convenient access to the Yasminaai APIs from Python.
 
@@ -23,7 +23,7 @@ The Yasminaai Python library provides convenient access to the Yasminaai APIs fr
 ## Installation
 
 ```sh
-pip install yasminaai
+pip install yasmina-motor-python
 ```
 
 ## Reference

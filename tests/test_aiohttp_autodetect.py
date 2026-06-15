@@ -95,7 +95,7 @@ class TestDefaultClientsWithoutAiohttp(unittest.TestCase):
 
             with self.assertRaises(RuntimeError) as ctx:
                 yasminaai._default_clients.DefaultAioHttpClient()
-            self.assertIn("pip install yasminaai[aiohttp]", str(ctx.exception))
+            self.assertIn("pip install yasmina-motor-python[aiohttp]", str(ctx.exception))
 
         importlib.reload(yasminaai._default_clients)
 
