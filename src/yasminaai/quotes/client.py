@@ -5,10 +5,11 @@ import typing
 
 from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ..core.request_options import RequestOptions
+from ..types.paginated_quote_response import PaginatedQuoteResponse
 from ..types.quote_response import QuoteResponse
 from .raw_client import AsyncRawQuotesClient, RawQuotesClient
 from .types.delete_quote_requests_id_response import DeleteQuoteRequestsIdResponse
-from .types.get_quote_requests_response import GetQuoteRequestsResponse
+from .types.post_quote_requests_request_accept_language import PostQuoteRequestsRequestAcceptLanguage
 from .types.post_quote_requests_request_drivers_item import PostQuoteRequestsRequestDriversItem
 
 # this is used as the default value for optional parameters
@@ -88,39 +89,79 @@ class QuotesClient:
         _response = self._raw_client.delete_quote(id, request_options=request_options)
         return _response.data
 
-    def list_quotes(self, *, request_options: typing.Optional[RequestOptions] = None) -> GetQuoteRequestsResponse:
+    def list_quotes(
+        self,
+        *,
+        date_from: typing.Optional[dt.date] = None,
+        date_to: typing.Optional[dt.date] = None,
+        per_page: typing.Optional[int] = None,
+        include_aggregates: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> PaginatedQuoteResponse:
         """
         Parameters
         ----------
+        date_from : typing.Optional[dt.date]
+            Inclusive lower bound for quote request creation date.
+
+        date_to : typing.Optional[dt.date]
+            Inclusive upper bound for quote request creation date.
+
+        per_page : typing.Optional[int]
+            Number of quote requests to return per page.
+
+        include_aggregates : typing.Optional[bool]
+            When true, includes quote request totals and monthly buckets for the filtered result set.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        GetQuoteRequestsResponse
+        PaginatedQuoteResponse
             Paginated list of quotes
 
         Examples
         --------
+        import datetime
+
         from yasminaai import YasminaaiApi
 
         client = YasminaaiApi(
             token="YOUR_TOKEN",
         )
-        client.quotes.list_quotes()
+        client.quotes.list_quotes(
+            date_from=datetime.date.fromisoformat(
+                "2026-06-01",
+            ),
+            date_to=datetime.date.fromisoformat(
+                "2026-06-30",
+            ),
+            per_page=10,
+            include_aggregates=True,
+        )
         """
-        _response = self._raw_client.list_quotes(request_options=request_options)
+        _response = self._raw_client.list_quotes(
+            date_from=date_from,
+            date_to=date_to,
+            per_page=per_page,
+            include_aggregates=include_aggregates,
+            request_options=request_options,
+        )
         return _response.data
 
     def request_quotes(
         self,
         *,
+        otp: str,
         owner_id: str,
         phone: str,
         birthdate: dt.date,
-        car_sequence_number: str,
         car_estimated_cost: float,
+        accept_language: typing.Optional[PostQuoteRequestsRequestAcceptLanguage] = None,
         email: typing.Optional[str] = OMIT,
+        car_sequence_number: typing.Optional[str] = OMIT,
+        custom_number: typing.Optional[str] = OMIT,
         is_ownership_transfer: typing.Optional[bool] = OMIT,
         current_car_owner_id: typing.Optional[str] = OMIT,
         car_model_year: typing.Optional[int] = OMIT,
@@ -134,6 +175,9 @@ class QuotesClient:
 
         Parameters
         ----------
+        otp : str
+            The OTP received by the customer from the Request OTP API
+
         owner_id : str
             Owner ID must be 10 digits starting with 1, 2, or 7
 
@@ -143,14 +187,20 @@ class QuotesClient:
         birthdate : dt.date
             Birthdate in YYYY-MM-DD format
 
-        car_sequence_number : str
-            Car sequence number must be 8 or 9 digits
-
         car_estimated_cost : float
             Estimated cost of the car
 
+        accept_language : typing.Optional[PostQuoteRequestsRequestAcceptLanguage]
+            Set to ar to receive Arabic-localized quote content.
+
         email : typing.Optional[str]
             Email address must be valid and belongs to the customer
+
+        car_sequence_number : typing.Optional[str]
+            Car sequence number must be 8 or 9 digits
+
+        custom_number : typing.Optional[str]
+            Custom car number between 1000000 and 9999999999 (for newly imported cars)
 
         is_ownership_transfer : typing.Optional[bool]
             Indicates if the ownership is being transferred
@@ -185,22 +235,25 @@ class QuotesClient:
             token="YOUR_TOKEN",
         )
         client.quotes.request_quotes(
+            otp="123456",
             owner_id="owner_id",
             phone="phone",
             birthdate=datetime.date.fromisoformat(
                 "2023-01-15",
             ),
-            car_sequence_number="car_sequence_number",
             car_estimated_cost=1.1,
         )
         """
         _response = self._raw_client.request_quotes(
+            otp=otp,
             owner_id=owner_id,
             phone=phone,
             birthdate=birthdate,
-            car_sequence_number=car_sequence_number,
             car_estimated_cost=car_estimated_cost,
+            accept_language=accept_language,
             email=email,
+            car_sequence_number=car_sequence_number,
+            custom_number=custom_number,
             is_ownership_transfer=is_ownership_transfer,
             current_car_owner_id=current_car_owner_id,
             car_model_year=car_model_year,
@@ -300,21 +353,42 @@ class AsyncQuotesClient:
         _response = await self._raw_client.delete_quote(id, request_options=request_options)
         return _response.data
 
-    async def list_quotes(self, *, request_options: typing.Optional[RequestOptions] = None) -> GetQuoteRequestsResponse:
+    async def list_quotes(
+        self,
+        *,
+        date_from: typing.Optional[dt.date] = None,
+        date_to: typing.Optional[dt.date] = None,
+        per_page: typing.Optional[int] = None,
+        include_aggregates: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> PaginatedQuoteResponse:
         """
         Parameters
         ----------
+        date_from : typing.Optional[dt.date]
+            Inclusive lower bound for quote request creation date.
+
+        date_to : typing.Optional[dt.date]
+            Inclusive upper bound for quote request creation date.
+
+        per_page : typing.Optional[int]
+            Number of quote requests to return per page.
+
+        include_aggregates : typing.Optional[bool]
+            When true, includes quote request totals and monthly buckets for the filtered result set.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        GetQuoteRequestsResponse
+        PaginatedQuoteResponse
             Paginated list of quotes
 
         Examples
         --------
         import asyncio
+        import datetime
 
         from yasminaai import AsyncYasminaaiApi
 
@@ -324,23 +398,41 @@ class AsyncQuotesClient:
 
 
         async def main() -> None:
-            await client.quotes.list_quotes()
+            await client.quotes.list_quotes(
+                date_from=datetime.date.fromisoformat(
+                    "2026-06-01",
+                ),
+                date_to=datetime.date.fromisoformat(
+                    "2026-06-30",
+                ),
+                per_page=10,
+                include_aggregates=True,
+            )
 
 
         asyncio.run(main())
         """
-        _response = await self._raw_client.list_quotes(request_options=request_options)
+        _response = await self._raw_client.list_quotes(
+            date_from=date_from,
+            date_to=date_to,
+            per_page=per_page,
+            include_aggregates=include_aggregates,
+            request_options=request_options,
+        )
         return _response.data
 
     async def request_quotes(
         self,
         *,
+        otp: str,
         owner_id: str,
         phone: str,
         birthdate: dt.date,
-        car_sequence_number: str,
         car_estimated_cost: float,
+        accept_language: typing.Optional[PostQuoteRequestsRequestAcceptLanguage] = None,
         email: typing.Optional[str] = OMIT,
+        car_sequence_number: typing.Optional[str] = OMIT,
+        custom_number: typing.Optional[str] = OMIT,
         is_ownership_transfer: typing.Optional[bool] = OMIT,
         current_car_owner_id: typing.Optional[str] = OMIT,
         car_model_year: typing.Optional[int] = OMIT,
@@ -354,6 +446,9 @@ class AsyncQuotesClient:
 
         Parameters
         ----------
+        otp : str
+            The OTP received by the customer from the Request OTP API
+
         owner_id : str
             Owner ID must be 10 digits starting with 1, 2, or 7
 
@@ -363,14 +458,20 @@ class AsyncQuotesClient:
         birthdate : dt.date
             Birthdate in YYYY-MM-DD format
 
-        car_sequence_number : str
-            Car sequence number must be 8 or 9 digits
-
         car_estimated_cost : float
             Estimated cost of the car
 
+        accept_language : typing.Optional[PostQuoteRequestsRequestAcceptLanguage]
+            Set to ar to receive Arabic-localized quote content.
+
         email : typing.Optional[str]
             Email address must be valid and belongs to the customer
+
+        car_sequence_number : typing.Optional[str]
+            Car sequence number must be 8 or 9 digits
+
+        custom_number : typing.Optional[str]
+            Custom car number between 1000000 and 9999999999 (for newly imported cars)
 
         is_ownership_transfer : typing.Optional[bool]
             Indicates if the ownership is being transferred
@@ -409,12 +510,12 @@ class AsyncQuotesClient:
 
         async def main() -> None:
             await client.quotes.request_quotes(
+                otp="123456",
                 owner_id="owner_id",
                 phone="phone",
                 birthdate=datetime.date.fromisoformat(
                     "2023-01-15",
                 ),
-                car_sequence_number="car_sequence_number",
                 car_estimated_cost=1.1,
             )
 
@@ -422,12 +523,15 @@ class AsyncQuotesClient:
         asyncio.run(main())
         """
         _response = await self._raw_client.request_quotes(
+            otp=otp,
             owner_id=owner_id,
             phone=phone,
             birthdate=birthdate,
-            car_sequence_number=car_sequence_number,
             car_estimated_cost=car_estimated_cost,
+            accept_language=accept_language,
             email=email,
+            car_sequence_number=car_sequence_number,
+            custom_number=custom_number,
             is_ownership_transfer=is_ownership_transfer,
             current_car_owner_id=current_car_owner_id,
             car_model_year=car_model_year,

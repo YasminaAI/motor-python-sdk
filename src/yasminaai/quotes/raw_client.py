@@ -14,9 +14,10 @@ from ..core.request_options import RequestOptions
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..errors.not_found_error import NotFoundError
 from ..errors.unauthorized_error import UnauthorizedError
+from ..types.paginated_quote_response import PaginatedQuoteResponse
 from ..types.quote_response import QuoteResponse
 from .types.delete_quote_requests_id_response import DeleteQuoteRequestsIdResponse
-from .types.get_quote_requests_response import GetQuoteRequestsResponse
+from .types.post_quote_requests_request_accept_language import PostQuoteRequestsRequestAcceptLanguage
 from .types.post_quote_requests_request_drivers_item import PostQuoteRequestsRequestDriversItem
 from pydantic import ValidationError
 
@@ -131,34 +132,69 @@ class RawQuotesClient:
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
     def list_quotes(
-        self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> HttpResponse[GetQuoteRequestsResponse]:
+        self,
+        *,
+        date_from: typing.Optional[dt.date] = None,
+        date_to: typing.Optional[dt.date] = None,
+        per_page: typing.Optional[int] = None,
+        include_aggregates: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> HttpResponse[PaginatedQuoteResponse]:
         """
         Parameters
         ----------
+        date_from : typing.Optional[dt.date]
+            Inclusive lower bound for quote request creation date.
+
+        date_to : typing.Optional[dt.date]
+            Inclusive upper bound for quote request creation date.
+
+        per_page : typing.Optional[int]
+            Number of quote requests to return per page.
+
+        include_aggregates : typing.Optional[bool]
+            When true, includes quote request totals and monthly buckets for the filtered result set.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        HttpResponse[GetQuoteRequestsResponse]
+        HttpResponse[PaginatedQuoteResponse]
             Paginated list of quotes
         """
         _response = self._client_wrapper.httpx_client.request(
             "quote-requests",
             method="GET",
+            params={
+                "date_from": str(date_from) if date_from is not None else None,
+                "date_to": str(date_to) if date_to is not None else None,
+                "per_page": per_page,
+                "include_aggregates": include_aggregates,
+            },
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 _data = typing.cast(
-                    GetQuoteRequestsResponse,
+                    PaginatedQuoteResponse,
                     parse_obj_as(
-                        type_=GetQuoteRequestsResponse,  # type: ignore
+                        type_=PaginatedQuoteResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
                 return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
@@ -171,12 +207,15 @@ class RawQuotesClient:
     def request_quotes(
         self,
         *,
+        otp: str,
         owner_id: str,
         phone: str,
         birthdate: dt.date,
-        car_sequence_number: str,
         car_estimated_cost: float,
+        accept_language: typing.Optional[PostQuoteRequestsRequestAcceptLanguage] = None,
         email: typing.Optional[str] = OMIT,
+        car_sequence_number: typing.Optional[str] = OMIT,
+        custom_number: typing.Optional[str] = OMIT,
         is_ownership_transfer: typing.Optional[bool] = OMIT,
         current_car_owner_id: typing.Optional[str] = OMIT,
         car_model_year: typing.Optional[int] = OMIT,
@@ -190,6 +229,9 @@ class RawQuotesClient:
 
         Parameters
         ----------
+        otp : str
+            The OTP received by the customer from the Request OTP API
+
         owner_id : str
             Owner ID must be 10 digits starting with 1, 2, or 7
 
@@ -199,14 +241,20 @@ class RawQuotesClient:
         birthdate : dt.date
             Birthdate in YYYY-MM-DD format
 
-        car_sequence_number : str
-            Car sequence number must be 8 or 9 digits
-
         car_estimated_cost : float
             Estimated cost of the car
 
+        accept_language : typing.Optional[PostQuoteRequestsRequestAcceptLanguage]
+            Set to ar to receive Arabic-localized quote content.
+
         email : typing.Optional[str]
             Email address must be valid and belongs to the customer
+
+        car_sequence_number : typing.Optional[str]
+            Car sequence number must be 8 or 9 digits
+
+        custom_number : typing.Optional[str]
+            Custom car number between 1000000 and 9999999999 (for newly imported cars)
 
         is_ownership_transfer : typing.Optional[bool]
             Indicates if the ownership is being transferred
@@ -235,11 +283,13 @@ class RawQuotesClient:
             "quote-requests",
             method="POST",
             json={
+                "otp": otp,
                 "owner_id": owner_id,
                 "email": email,
                 "phone": phone,
                 "birthdate": birthdate,
                 "car_sequence_number": car_sequence_number,
+                "custom_number": custom_number,
                 "is_ownership_transfer": is_ownership_transfer,
                 "current_car_owner_id": current_car_owner_id,
                 "car_estimated_cost": car_estimated_cost,
@@ -251,6 +301,7 @@ class RawQuotesClient:
             },
             headers={
                 "content-type": "application/json",
+                "Accept-Language": str(accept_language) if accept_language is not None else None,
             },
             request_options=request_options,
             omit=OMIT,
@@ -393,34 +444,69 @@ class AsyncRawQuotesClient:
         raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response_json)
 
     async def list_quotes(
-        self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> AsyncHttpResponse[GetQuoteRequestsResponse]:
+        self,
+        *,
+        date_from: typing.Optional[dt.date] = None,
+        date_to: typing.Optional[dt.date] = None,
+        per_page: typing.Optional[int] = None,
+        include_aggregates: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncHttpResponse[PaginatedQuoteResponse]:
         """
         Parameters
         ----------
+        date_from : typing.Optional[dt.date]
+            Inclusive lower bound for quote request creation date.
+
+        date_to : typing.Optional[dt.date]
+            Inclusive upper bound for quote request creation date.
+
+        per_page : typing.Optional[int]
+            Number of quote requests to return per page.
+
+        include_aggregates : typing.Optional[bool]
+            When true, includes quote request totals and monthly buckets for the filtered result set.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        AsyncHttpResponse[GetQuoteRequestsResponse]
+        AsyncHttpResponse[PaginatedQuoteResponse]
             Paginated list of quotes
         """
         _response = await self._client_wrapper.httpx_client.request(
             "quote-requests",
             method="GET",
+            params={
+                "date_from": str(date_from) if date_from is not None else None,
+                "date_to": str(date_to) if date_to is not None else None,
+                "per_page": per_page,
+                "include_aggregates": include_aggregates,
+            },
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 _data = typing.cast(
-                    GetQuoteRequestsResponse,
+                    PaginatedQuoteResponse,
                     parse_obj_as(
-                        type_=GetQuoteRequestsResponse,  # type: ignore
+                        type_=PaginatedQuoteResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
                 return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 401:
+                raise UnauthorizedError(
+                    headers=dict(_response.headers),
+                    body=typing.cast(
+                        typing.Any,
+                        parse_obj_as(
+                            type_=typing.Any,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    ),
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, headers=dict(_response.headers), body=_response.text)
@@ -433,12 +519,15 @@ class AsyncRawQuotesClient:
     async def request_quotes(
         self,
         *,
+        otp: str,
         owner_id: str,
         phone: str,
         birthdate: dt.date,
-        car_sequence_number: str,
         car_estimated_cost: float,
+        accept_language: typing.Optional[PostQuoteRequestsRequestAcceptLanguage] = None,
         email: typing.Optional[str] = OMIT,
+        car_sequence_number: typing.Optional[str] = OMIT,
+        custom_number: typing.Optional[str] = OMIT,
         is_ownership_transfer: typing.Optional[bool] = OMIT,
         current_car_owner_id: typing.Optional[str] = OMIT,
         car_model_year: typing.Optional[int] = OMIT,
@@ -452,6 +541,9 @@ class AsyncRawQuotesClient:
 
         Parameters
         ----------
+        otp : str
+            The OTP received by the customer from the Request OTP API
+
         owner_id : str
             Owner ID must be 10 digits starting with 1, 2, or 7
 
@@ -461,14 +553,20 @@ class AsyncRawQuotesClient:
         birthdate : dt.date
             Birthdate in YYYY-MM-DD format
 
-        car_sequence_number : str
-            Car sequence number must be 8 or 9 digits
-
         car_estimated_cost : float
             Estimated cost of the car
 
+        accept_language : typing.Optional[PostQuoteRequestsRequestAcceptLanguage]
+            Set to ar to receive Arabic-localized quote content.
+
         email : typing.Optional[str]
             Email address must be valid and belongs to the customer
+
+        car_sequence_number : typing.Optional[str]
+            Car sequence number must be 8 or 9 digits
+
+        custom_number : typing.Optional[str]
+            Custom car number between 1000000 and 9999999999 (for newly imported cars)
 
         is_ownership_transfer : typing.Optional[bool]
             Indicates if the ownership is being transferred
@@ -497,11 +595,13 @@ class AsyncRawQuotesClient:
             "quote-requests",
             method="POST",
             json={
+                "otp": otp,
                 "owner_id": owner_id,
                 "email": email,
                 "phone": phone,
                 "birthdate": birthdate,
                 "car_sequence_number": car_sequence_number,
+                "custom_number": custom_number,
                 "is_ownership_transfer": is_ownership_transfer,
                 "current_car_owner_id": current_car_owner_id,
                 "car_estimated_cost": car_estimated_cost,
@@ -513,6 +613,7 @@ class AsyncRawQuotesClient:
             },
             headers={
                 "content-type": "application/json",
+                "Accept-Language": str(accept_language) if accept_language is not None else None,
             },
             request_options=request_options,
             omit=OMIT,

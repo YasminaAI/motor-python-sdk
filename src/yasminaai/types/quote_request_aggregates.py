@@ -3,13 +3,19 @@
 import typing
 
 import pydantic
-from ...core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 
 
-class GetQuoteRequestsResponseLinksItem(UniversalBaseModel):
-    url: typing.Optional[str] = None
-    label: typing.Optional[str] = None
-    active: typing.Optional[bool] = None
+class QuoteRequestAggregates(UniversalBaseModel):
+    """
+    Returned only when include_aggregates is true.
+    """
+
+    total_count: typing.Optional[int] = None
+    by_month: typing.Optional[typing.Dict[str, int]] = pydantic.Field(default=None)
+    """
+    Monthly quote request counts keyed by YYYY-MM.
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

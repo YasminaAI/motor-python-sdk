@@ -18,7 +18,7 @@ from yasminaai.environment import YasminaaiApiEnvironment
 
 client = YasminaaiApi(
     token="<token>",
-    environment=YasminaaiApiEnvironment.DEFAULT,
+    environment=YasminaaiApiEnvironment.SANDBOX,
 )
 
 client.quotes.show_quote(
@@ -77,7 +77,7 @@ from yasminaai.environment import YasminaaiApiEnvironment
 
 client = YasminaaiApi(
     token="<token>",
-    environment=YasminaaiApiEnvironment.DEFAULT,
+    environment=YasminaaiApiEnvironment.SANDBOX,
 )
 
 client.quotes.delete_quote(
@@ -118,7 +118,7 @@ client.quotes.delete_quote(
 </dl>
 </details>
 
-<details><summary><code>client.quotes.<a href="src/yasminaai/quotes/client.py">list_quotes</a>() -> GetQuoteRequestsResponse</code></summary>
+<details><summary><code>client.quotes.<a href="src/yasminaai/quotes/client.py">list_quotes</a>(...) -> PaginatedQuoteResponse</code></summary>
 <dl>
 <dd>
 
@@ -133,13 +133,19 @@ client.quotes.delete_quote(
 ```python
 from yasminaai import YasminaaiApi
 from yasminaai.environment import YasminaaiApiEnvironment
+import datetime
 
 client = YasminaaiApi(
     token="<token>",
-    environment=YasminaaiApiEnvironment.DEFAULT,
+    environment=YasminaaiApiEnvironment.SANDBOX,
 )
 
-client.quotes.list_quotes()
+client.quotes.list_quotes(
+    date_from=datetime.date.fromisoformat("2026-06-01"),
+    date_to=datetime.date.fromisoformat("2026-06-30"),
+    per_page=10,
+    include_aggregates=True,
+)
 
 ```
 </dd>
@@ -151,6 +157,38 @@ client.quotes.list_quotes()
 
 <dl>
 <dd>
+
+<dl>
+<dd>
+
+**date_from:** `typing.Optional[datetime.date]` — Inclusive lower bound for quote request creation date.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**date_to:** `typing.Optional[datetime.date]` — Inclusive upper bound for quote request creation date.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**per_page:** `typing.Optional[int]` — Number of quote requests to return per page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**include_aggregates:** `typing.Optional[bool]` — When true, includes quote request totals and monthly buckets for the filtered result set.
+    
+</dd>
+</dl>
 
 <dl>
 <dd>
@@ -201,14 +239,14 @@ import datetime
 
 client = YasminaaiApi(
     token="<token>",
-    environment=YasminaaiApiEnvironment.DEFAULT,
+    environment=YasminaaiApiEnvironment.SANDBOX,
 )
 
 client.quotes.request_quotes(
+    otp="123456",
     owner_id="owner_id",
     phone="phone",
     birthdate=datetime.date.fromisoformat("2023-01-15"),
-    car_sequence_number="car_sequence_number",
     car_estimated_cost=1.1,
 )
 
@@ -222,6 +260,14 @@ client.quotes.request_quotes(
 
 <dl>
 <dd>
+
+<dl>
+<dd>
+
+**otp:** `str` — The OTP received by the customer from the Request OTP API
+    
+</dd>
+</dl>
 
 <dl>
 <dd>
@@ -250,14 +296,6 @@ client.quotes.request_quotes(
 <dl>
 <dd>
 
-**car_sequence_number:** `str` — Car sequence number must be 8 or 9 digits
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **car_estimated_cost:** `float` — Estimated cost of the car
     
 </dd>
@@ -266,7 +304,31 @@ client.quotes.request_quotes(
 <dl>
 <dd>
 
+**accept_language:** `typing.Optional[PostQuoteRequestsRequestAcceptLanguage]` — Set to ar to receive Arabic-localized quote content.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **email:** `typing.Optional[str]` — Email address must be valid and belongs to the customer
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**car_sequence_number:** `typing.Optional[str]` — Car sequence number must be 8 or 9 digits
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**custom_number:** `typing.Optional[str]` — Custom car number between 1000000 and 9999999999 (for newly imported cars)
     
 </dd>
 </dl>
@@ -359,7 +421,7 @@ from yasminaai.environment import YasminaaiApiEnvironment
 
 client = YasminaaiApi(
     token="<token>",
-    environment=YasminaaiApiEnvironment.DEFAULT,
+    environment=YasminaaiApiEnvironment.SANDBOX,
 )
 
 client.policies.show_policy(
@@ -400,7 +462,7 @@ client.policies.show_policy(
 </dl>
 </details>
 
-<details><summary><code>client.policies.<a href="src/yasminaai/policies/client.py">list_policies</a>(...) -> typing.List[Policy]</code></summary>
+<details><summary><code>client.policies.<a href="src/yasminaai/policies/client.py">list_policies</a>(...) -> PaginatedPolicyResponse</code></summary>
 <dl>
 <dd>
 
@@ -429,13 +491,18 @@ Listing requested policies
 ```python
 from yasminaai import YasminaaiApi
 from yasminaai.environment import YasminaaiApiEnvironment
+import datetime
 
 client = YasminaaiApi(
     token="<token>",
-    environment=YasminaaiApiEnvironment.DEFAULT,
+    environment=YasminaaiApiEnvironment.SANDBOX,
 )
 
-client.policies.list_policies()
+client.policies.list_policies(
+    date_from=datetime.date.fromisoformat("2026-06-01"),
+    date_to=datetime.date.fromisoformat("2026-06-30"),
+    include_aggregates=True,
+)
 
 ```
 </dd>
@@ -531,6 +598,30 @@ client.policies.list_policies()
 <dl>
 <dd>
 
+**date_from:** `typing.Optional[datetime.date]` — Inclusive lower bound for the policy date. For issued policies (`status=1`), this filters by `uploaded_at` (the provider policy issue timestamp) and falls back to `created_at` when `uploaded_at` is unavailable. For other statuses, this filters by `created_at`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**date_to:** `typing.Optional[datetime.date]` — Inclusive upper bound for the policy date. For issued policies (`status=1`), this filters by `uploaded_at` (the provider policy issue timestamp) and falls back to `created_at` when `uploaded_at` is unavailable. For other statuses, this filters by `created_at`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**include_aggregates:** `typing.Optional[bool]` — When true, includes policy totals, total price, and monthly buckets for the filtered result set.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
     
 </dd>
@@ -575,10 +666,11 @@ from yasminaai.environment import YasminaaiApiEnvironment
 
 client = YasminaaiApi(
     token="<token>",
-    environment=YasminaaiApiEnvironment.DEFAULT,
+    environment=YasminaaiApiEnvironment.SANDBOX,
 )
 
 client.policies.issue_policy(
+    otp="123456",
     quote_request_id=123,
     quote_reference_id="550e8400-e29b-41d4-a716-446655440000",
     quote_price_id="550e8400-e29b-41d4-a716-446655440001",
@@ -594,6 +686,14 @@ client.policies.issue_policy(
 
 <dl>
 <dd>
+
+<dl>
+<dd>
+
+**otp:** `str` — The OTP received by the customer from the Issue OTP API
+    
+</dd>
+</dl>
 
 <dl>
 <dd>
@@ -683,7 +783,7 @@ from yasminaai.environment import YasminaaiApiEnvironment
 
 client = YasminaaiApi(
     token="<token>",
-    environment=YasminaaiApiEnvironment.DEFAULT,
+    environment=YasminaaiApiEnvironment.SANDBOX,
 )
 
 client.ot_ps.request_otp_for_quote_verification(
@@ -774,7 +874,7 @@ from yasminaai.environment import YasminaaiApiEnvironment
 
 client = YasminaaiApi(
     token="<token>",
-    environment=YasminaaiApiEnvironment.DEFAULT,
+    environment=YasminaaiApiEnvironment.SANDBOX,
 )
 
 client.ot_ps.request_otp_for_issuing_policy(

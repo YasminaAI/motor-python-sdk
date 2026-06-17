@@ -4,4 +4,5 @@ import enum
 
 
 class YasminaaiApiEnvironment(enum.Enum):
-    DEFAULT = "https://staging.yasmina.ai/api/v1/car-comp"
+    SANDBOX = "https://sandbox.yasmina.ai/api/v1/car-comp"
+    PRODUCTION = "https://production.yasmina.ai/api/v1/car-comp"

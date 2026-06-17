@@ -4,28 +4,30 @@ import typing
 
 import pydantic
 import typing_extensions
-from ...core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
-from ...core.serialization import FieldMetadata
-from ...types.quote_response import QuoteResponse
-from .get_quote_requests_response_links_item import GetQuoteRequestsResponseLinksItem
+from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
+from ..core.serialization import FieldMetadata
+from .pagination_link import PaginationLink
+from .policy import Policy
+from .policy_aggregates import PolicyAggregates
 
 
-class GetQuoteRequestsResponse(UniversalBaseModel):
+class PaginatedPolicyResponse(UniversalBaseModel):
     current_page: typing.Optional[int] = None
-    data: typing.Optional[typing.List[QuoteResponse]] = None
+    data: typing.Optional[typing.List[Policy]] = None
     first_page_url: typing.Optional[str] = None
     from_: typing_extensions.Annotated[
         typing.Optional[int], FieldMetadata(alias="from"), pydantic.Field(alias="from")
     ] = None
     last_page: typing.Optional[int] = None
     last_page_url: typing.Optional[str] = None
-    links: typing.Optional[typing.List[GetQuoteRequestsResponseLinksItem]] = None
+    links: typing.Optional[typing.List[PaginationLink]] = None
     next_page_url: typing.Optional[str] = None
     path: typing.Optional[str] = None
     per_page: typing.Optional[int] = None
     prev_page_url: typing.Optional[str] = None
     to: typing.Optional[int] = None
     total: typing.Optional[int] = None
+    aggregates: typing.Optional[PolicyAggregates] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

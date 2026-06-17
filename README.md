@@ -43,10 +43,10 @@ client = YasminaaiApi(
 )
 
 client.quotes.request_quotes(
+    otp="123456",
     owner_id="owner_id",
     phone="phone",
     birthdate=datetime.date.fromisoformat("2023-01-15"),
-    car_sequence_number="car_sequence_number",
     car_estimated_cost=1.1,
 )
 ```
@@ -60,7 +60,7 @@ from yasminaai import YasminaaiApi
 from yasminaai.environment import YasminaaiApiEnvironment
 
 client = YasminaaiApi(
-    environment=YasminaaiApiEnvironment.DEFAULT,
+    environment=YasminaaiApiEnvironment.SANDBOX,
 )
 ```
 
@@ -81,10 +81,10 @@ client = AsyncYasminaaiApi(
 
 async def main() -> None:
     await client.quotes.request_quotes(
+        otp="123456",
         owner_id="owner_id",
         phone="phone",
         birthdate=datetime.date.fromisoformat("2023-01-15"),
-        car_sequence_number="car_sequence_number",
         car_estimated_cost=1.1,
     )
 
