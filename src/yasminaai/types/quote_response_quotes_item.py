@@ -6,10 +6,41 @@ import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 from .benefit import Benefit
 from .quote_price import QuotePrice
+from .quote_response_quotes_item_type import QuoteResponseQuotesItemType
 
 
 class QuoteResponseQuotesItem(UniversalBaseModel):
     company_name: typing.Optional[str] = None
+    company_name_ar: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Arabic name of the insurance company. Use this field instead of `company_name` when rendering Arabic UIs.
+    """
+
+    type: typing.Optional[QuoteResponseQuotesItemType] = pydantic.Field(default=None)
+    """
+    Normalised insurance category used to group and filter quotes. Always one of `TPL`, `TPL +`, or `Comprehensive`.
+    """
+
+    insurance_type_display: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    The insurance type label exactly as the insurance provider intends it to be displayed. While `type` normalises all non-TPL / non-Comprehensive values into `TPL +`, this field preserves the original provider string (e.g. "TPL Plus", "Third Party Plus") and should be shown in the UI wherever the provider's own wording is preferred.
+    """
+
+    insurance_type_display_ar: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Arabic translation of `insurance_type_display`. Use this field for Arabic UIs. Falls back to the English value for provider-specific types that do not have a translation.
+    """
+
+    company_logo_url: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    CDN URL for the insurance company's logo.
+    """
+
+    square_company_logo_url: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    CDN URL for the insurance company's square logo.
+    """
+
     prices: typing.Optional[typing.List[QuotePrice]] = pydantic.Field(default=None)
     """
     An array representing each price. This will have the premium and the deductible

@@ -30,6 +30,11 @@ class QuoteResponse(UniversalBaseModel):
     The car sequence number from 9 digits
     """
 
+    custom_number: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Custom car number for newly imported cars (present when `custom_number` was used in the request)
+    """
+
     is_ownership_transfer: typing.Optional[bool] = pydantic.Field(default=None)
     """
     Whether it was a car transfer or not

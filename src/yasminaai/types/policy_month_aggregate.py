@@ -6,18 +6,9 @@ import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2, UniversalBaseModel
 
 
-class Benefit(UniversalBaseModel):
-    quote_benefit_id: typing.Optional[str] = None
-    id: typing.Optional[str] = None
-    name: typing.Optional[str] = None
-    name_ar: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Arabic name of the benefit. Use this field instead of `name` when rendering Arabic UIs.
-    """
-
-    amount: typing.Optional[float] = None
-    vat: typing.Optional[float] = None
-    url: typing.Optional[str] = None
+class PolicyMonthAggregate(UniversalBaseModel):
+    count: typing.Optional[int] = None
+    total_price: typing.Optional[float] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

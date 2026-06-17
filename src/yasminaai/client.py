@@ -29,7 +29,7 @@ class YasminaaiApi:
 
 
 
-        Defaults to YasminaaiApiEnvironment.DEFAULT
+        Defaults to YasminaaiApiEnvironment.SANDBOX
 
 
 
@@ -65,7 +65,7 @@ class YasminaaiApi:
         self,
         *,
         base_url: typing.Optional[str] = None,
-        environment: YasminaaiApiEnvironment = YasminaaiApiEnvironment.DEFAULT,
+        environment: YasminaaiApiEnvironment = YasminaaiApiEnvironment.SANDBOX,
         token: typing.Union[str, typing.Callable[[], str]],
         headers: typing.Optional[typing.Dict[str, str]] = None,
         timeout: typing.Optional[float] = None,
@@ -152,7 +152,7 @@ class AsyncYasminaaiApi:
 
 
 
-        Defaults to YasminaaiApiEnvironment.DEFAULT
+        Defaults to YasminaaiApiEnvironment.SANDBOX
 
 
 
@@ -191,7 +191,7 @@ class AsyncYasminaaiApi:
         self,
         *,
         base_url: typing.Optional[str] = None,
-        environment: YasminaaiApiEnvironment = YasminaaiApiEnvironment.DEFAULT,
+        environment: YasminaaiApiEnvironment = YasminaaiApiEnvironment.SANDBOX,
         token: typing.Union[str, typing.Callable[[], str]],
         headers: typing.Optional[typing.Dict[str, str]] = None,
         async_token: typing.Optional[typing.Callable[[], typing.Awaitable[str]]] = None,

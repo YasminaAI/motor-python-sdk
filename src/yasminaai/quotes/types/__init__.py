@@ -7,13 +7,11 @@ from importlib import import_module
 
 if typing.TYPE_CHECKING:
     from .delete_quote_requests_id_response import DeleteQuoteRequestsIdResponse
-    from .get_quote_requests_response import GetQuoteRequestsResponse
-    from .get_quote_requests_response_links_item import GetQuoteRequestsResponseLinksItem
+    from .post_quote_requests_request_accept_language import PostQuoteRequestsRequestAcceptLanguage
     from .post_quote_requests_request_drivers_item import PostQuoteRequestsRequestDriversItem
 _dynamic_imports: typing.Dict[str, str] = {
     "DeleteQuoteRequestsIdResponse": ".delete_quote_requests_id_response",
-    "GetQuoteRequestsResponse": ".get_quote_requests_response",
-    "GetQuoteRequestsResponseLinksItem": ".get_quote_requests_response_links_item",
+    "PostQuoteRequestsRequestAcceptLanguage": ".post_quote_requests_request_accept_language",
     "PostQuoteRequestsRequestDriversItem": ".post_quote_requests_request_drivers_item",
 }
 
@@ -41,7 +39,6 @@ def __dir__():
 
 __all__ = [
     "DeleteQuoteRequestsIdResponse",
-    "GetQuoteRequestsResponse",
-    "GetQuoteRequestsResponseLinksItem",
+    "PostQuoteRequestsRequestAcceptLanguage",
     "PostQuoteRequestsRequestDriversItem",
 ]
